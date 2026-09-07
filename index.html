@@ -190,4 +190,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelectorAll('#friends .road-table tbody tr').forEach(row=>{const stay=row.querySelector('.road-table-stay strong');if(stay&&stay.textContent.includes('Багаж')){const first=[...document.querySelectorAll('#friends .road-table tbody tr')].find(r=>r!==row&&r.querySelector('.road-table-stay strong')?.textContent.includes('Шанхай'));if(first){const note=first.querySelector('.road-table-stay span');if(note&&!note.textContent.includes('багаж'))note.textContent+=' · багаж хранится до 22 октября'}row.remove()}});
 });
 </script>
+<style>
+@media(min-width:761px){.confirmed-group>.booking-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.confirmed-group>.booking-grid .booking-card.wide{grid-column:auto}}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.confirmed-group').forEach(group=>{
+    const sections=[...group.querySelectorAll(':scope > .booking-location-group')];
+    if(!sections.length)return;
+    const grid=document.createElement('div');grid.className='booking-grid';
+    sections.forEach(section=>section.querySelectorAll('.booking-card').forEach(card=>grid.append(card)));
+    sections.forEach(section=>section.remove());
+    group.append(grid);
+  });
+});
+</script>
 </body></html>
