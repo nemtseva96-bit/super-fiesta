@@ -162,5 +162,32 @@ body,body *:not(.material-symbols-rounded):not(.viz-icon):not(.move-icon):not(.r
 :root{--md-sys-typescale-display-large-font:Manrope,Arial,sans-serif;--md-sys-typescale-label-medium-size:14px;--md-sys-typescale-label-medium-line-height:20px}
 .status,.hero-card small,.road-date,.road-plan span,.road-fact small,.move small,.deadline,.credit,.footer,.booking-label,.booking-card>p,.booking-fact b,.booking-fact small,.booking-note,.road-table th,.road-table-place span,.road-table-details,.table-details summary,.table-details-body,.table-details-body p,.table-source-links a,.road-table-actions a,.road-table-flight,.road-table-flight strong,.road-table-flight span,.road-table-booking,.road-table-booking strong,.road-table-booking span,.location-links a,.map-head p,.map-note,.legend,.journey-stop span,.schedule-day span,.schedule-day em,.hike-copy small,.metric span,.task-group>p,.place p,.sleep,.ready-meta,small,figcaption{font-size:14px!important;line-height:20px!important}
 .ready-card .ready-count{font-size:14px!important;line-height:20px!important}
+@media(min-width:761px){.confirmed-head p{white-space:nowrap;max-width:none}}
+.booking-location-group{display:grid;gap:12px;margin-top:18px}.booking-location-group h4{margin:0;color:var(--muted);font-size:16px;line-height:24px}.booking-location-group .booking-grid{margin-top:0}.booking-address{margin:0 0 12px!important;color:var(--muted);font-size:14px!important;line-height:20px!important}.booking-address::first-letter{font-weight:700}
 </style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const groupCards=(group,labels)=>{
+    if(!group||group.dataset.grouped)return;
+    const grid=group.querySelector(':scope > .booking-grid'); if(!grid)return;
+    const cards=[...grid.children]; const buckets=new Map();
+    cards.forEach(card=>{const title=card.querySelector('h4')?.textContent||''; const label=labels(title); if(!buckets.has(label))buckets.set(label,[]); buckets.get(label).push(card)});
+    grid.remove(); group.dataset.grouped='true';
+    buckets.forEach((cards,label)=>{const section=document.createElement('section');section.className='booking-location-group';section.innerHTML=`<h4>${label}</h4><div class="booking-grid"></div>`;const target=section.querySelector('.booking-grid');cards.forEach(card=>target.append(card));group.append(section)});
+  };
+  groupCards(document.querySelector('.confirmed-group.flights'),title=>title.includes('Сеул')?'Сеул':title.includes('Чанша')?'Чанша':'Шанхай');
+  groupCards(document.querySelector('.confirmed-group.hotels'),title=>title.includes('Seoul')||title.includes('Сеуле')?'Сеул':title.includes('Huangshan')||title.includes('Хуаншань')?'Хуаншань':'Вансяньгу');
+  document.querySelectorAll('.confirmed-group.hotels .booking-card').forEach(card=>{
+    const heading=card.querySelector('h4'); if(!heading)return;
+    const seoulAddress=card.querySelector('.seoul-booking-address');
+    if(seoulAddress){seoulAddress.className='booking-address';seoulAddress.innerHTML='<strong>Адрес:</strong> '+seoulAddress.textContent.replace(/^Адрес:\s*/,'');heading.after(seoulAddress)}
+    else {const address=card.querySelector(':scope > p');if(address){address.classList.add('booking-address');address.innerHTML='<strong>Адрес:</strong> '+address.textContent.replace(/^Адрес:\s*/,'');heading.after(address)}}
+  });
+  document.querySelectorAll('.booking-note,.privacy-note').forEach(el=>el.remove());
+  const luggage=[...document.querySelectorAll('.road-stop')].find(card=>card.querySelector('h3')?.textContent.includes('Хранение багажа'));
+  const shanghai=[...document.querySelectorAll('.road-stop')].find(card=>card.querySelector('h3')?.textContent.includes('Шанхай'));
+  if(luggage){const text=luggage.querySelector('.road-copy>p')?.textContent||'';if(shanghai){const p=shanghai.querySelector('.road-copy>p');if(p&&!p.textContent.includes('багаж'))p.textContent+=' '+text} luggage.remove()}
+  document.querySelectorAll('#friends .road-table tbody tr').forEach(row=>{const stay=row.querySelector('.road-table-stay strong');if(stay&&stay.textContent.includes('Багаж')){const first=[...document.querySelectorAll('#friends .road-table tbody tr')].find(r=>r!==row&&r.querySelector('.road-table-stay strong')?.textContent.includes('Шанхай'));if(first){const note=first.querySelector('.road-table-stay span');if(note&&!note.textContent.includes('багаж'))note.textContent+=' · багаж хранится до 22 октября'}row.remove()}});
+});
+</script>
 </body></html>
