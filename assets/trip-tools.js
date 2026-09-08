@@ -99,7 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
   mapsSection.className = 'section trip-maps';
   mapsSection.id = 'maps';
   mapsSection.setAttribute('aria-labelledby', 'maps-heading');
-  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и мои места</h2></div>';
+  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и мои места</h2><p>Общий маршрут, передвижения и ссылки на личные списки в одном месте.</p></div>';
+  const fullRoute = $('.full-route');
+  if (fullRoute) {
+    const journeyHeading = fullRoute.querySelector('.section-title');
+    const journey = fullRoute.querySelector('.journey');
+    if (journeyHeading) mapsSection.append(journeyHeading);
+    if (journey) mapsSection.append(journey);
+    fullRoute.remove();
+  }
+  ['friends','couple'].forEach(routeId => {
+    const movement = document.querySelector(`#${routeId} > .section:has(.moves)`);
+    if (!movement) return;
+    movement.classList.add('combined-movement');
+    movement.dataset.route = routeId;
+    mapsSection.append(movement);
+  });
   mapsSection.append(mapCard);
   prep.before(mapsSection);
   const nav = document.createElement('nav');
@@ -146,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const panel = document.getElementById(item.dataset.route);
       panel.classList.toggle('active', selected);
     });
+    $$('.combined-movement').forEach(section => section.classList.toggle('is-active', section.dataset.route === tab.dataset.route));
     updateActiveSection();
   }
   tabs.forEach((tab,index) => {
@@ -290,4 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSavedMaps();
   if (!storageAvailable) $('#saved-map-status').textContent = 'Сохранение в браузере недоступно. Добавленные ссылки останутся только до перезагрузки.';
   if (location.hash && document.getElementById(location.hash.slice(1))) requestAnimationFrame(() => navigateTo(location.hash.slice(1),false));
+
+  // Enforce safe external-link behavior for legacy itinerary links too.
+  $$('a[target="_blank"]').forEach(link => link.rel = 'noopener noreferrer');
+  const hiddenLabel = $('.map-note');
+  if (hiddenLabel) hiddenLabel.remove();
+  const secondPartLabel = $$('.hike small').find(el => el.textContent.trim() === 'Только во второй части');
+  if (secondPartLabel) secondPartLabel.remove();
 });
