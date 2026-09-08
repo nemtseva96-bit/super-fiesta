@@ -1,0 +1,62 @@
+:root{--trip-nav-height:100px}
+.section-nav{position:sticky;top:8px;z-index:30;display:flex;gap:4px;padding:8px;margin-bottom:16px;overflow-x:auto;background:var(--md-sys-color-surface-container-low);border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-large);box-shadow:0 1px 2px #00000026}
+.section-nav a{display:flex;flex:1;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 16px;white-space:nowrap;color:var(--md-sys-color-on-surface-variant);font-size:14px;line-height:20px;font-weight:700;text-decoration:none;border-radius:var(--md-sys-shape-corner-medium)}
+.section-nav a:hover{background:var(--md-sys-color-surface-container-high)}
+.section-nav a[aria-current]{background:var(--md-sys-color-primary-container);color:var(--md-sys-color-on-primary-container);text-decoration:underline;text-underline-offset:4px}
+.main>.switcher{position:static;scroll-margin-top:var(--trip-nav-height)}
+#bookings,#hotels,#maps,#preparation,#trip-overview{scroll-margin-top:var(--trip-nav-height)}
+.trip-skip{position:fixed;top:8px;left:16px;z-index:100;transform:translateY(-160%);padding:12px 20px;background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);border-radius:12px;font-size:16px}
+.trip-skip:focus{transform:none}
+.prep-reviewed,.prep-storage{font-size:14px!important;line-height:20px!important}
+.prep-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:24px}
+.prep-filters{display:flex;flex-wrap:wrap;gap:8px}
+.prep-filters button,.personal-maps button{min-height:44px;padding:12px 16px;border:1px solid var(--md-sys-color-outline);border-radius:999px;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface);font-family:Manrope,Arial,sans-serif;font-size:14px;line-height:20px;font-weight:700;cursor:pointer}
+.prep-filters button[aria-pressed=true]{background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);border-color:var(--md-sys-color-primary)}
+.prep-filters button:hover,.personal-maps button:hover{box-shadow:inset 0 0 0 2px var(--md-sys-color-outline)}
+.prep-filters button:active,.personal-maps button:active{transform:translateY(1px)}
+#prep-progress{font-size:14px;line-height:20px;font-weight:700;margin:0}
+#preparation .prep-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+#preparation .task-group{min-width:0}
+#preparation .task-group>h3{font-size:22px;line-height:28px}
+.prep-task{border:1px solid var(--md-sys-color-outline-variant);border-radius:16px;background:var(--md-sys-color-surface);overflow:hidden}
+.prep-task--priority{border:2px solid var(--md-sys-color-primary)}
+#preparation .task{display:flex;gap:12px;align-items:flex-start;min-height:48px;margin:0;padding:16px;border:0;border-radius:0;background:transparent;color:var(--md-sys-color-on-surface);cursor:pointer}
+#preparation .task:hover{background:var(--md-sys-color-surface-container)}
+#preparation .task>span{font-size:16px;line-height:24px;font-weight:700;min-width:0}
+#preparation input[type=checkbox]{width:24px;height:24px;min-width:24px;margin:0;accent-color:var(--md-sys-color-primary)}
+.prep-task-note{font-size:14px;line-height:20px;color:var(--md-sys-color-on-surface-variant);margin:0;padding:0 16px 16px 52px;overflow-wrap:anywhere}
+.prep-source{padding:0 16px 12px 52px}
+.prep-source a,.personal-maps a,.map-stop-list a{display:inline-flex;align-items:center;gap:8px;min-height:44px;color:var(--md-sys-color-primary);font-size:14px;line-height:20px;overflow-wrap:anywhere}
+.prep-task.is-done{background:var(--md-sys-color-surface-container)}
+.prep-task.is-done .task>span{text-decoration:line-through}
+.prep-task .deadline-chip{display:table;margin-top:8px;white-space:normal;font-size:14px;line-height:20px;background:var(--md-sys-color-tertiary-container);color:var(--md-sys-color-on-tertiary-container);padding:4px 8px;border-radius:8px}
+#preparation [hidden]{display:none!important}
+.prep-empty{padding:24px;font-size:16px;line-height:24px}
+.google-map-controls{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:0 24px 20px}
+.google-map-controls label{font-size:14px;line-height:20px;font-weight:700}
+.google-map-controls select,.personal-maps input{width:100%;min-width:0;min-height:48px;padding:12px;border:1px solid var(--md-sys-color-outline);border-radius:12px;font-family:Manrope,Arial,sans-serif;font-size:16px;line-height:24px;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)}
+.google-map-controls>a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 16px;border-radius:999px;background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);font-size:14px;line-height:20px;text-decoration:none;font-weight:700}
+.google-map-controls>a:hover{box-shadow:inset 0 0 0 2px var(--md-sys-color-on-primary)}
+iframe.google-map-frame,iframe#trip-map{display:block;width:100%;height:460px;min-height:240px;border:0;background:var(--md-sys-color-surface-container)}
+.google-map-note{padding:20px 24px 0;margin:0;color:var(--md-sys-color-on-surface-variant);font-size:14px;line-height:20px}
+.map-stop-list{margin:16px 24px 24px}
+.map-stop-list summary,.personal-maps summary{min-height:44px;cursor:pointer;padding:12px 0;font-size:14px;line-height:20px;font-weight:700;color:var(--md-sys-color-primary)}
+.map-stop-list ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-left:20px}
+.personal-maps{padding:24px;margin-top:24px;border-radius:28px;background:var(--md-sys-color-surface-container-low);border:1px solid var(--md-sys-color-outline-variant);color:var(--md-sys-color-on-surface)}
+.personal-maps h3{font-size:28px;line-height:36px;margin:0 0 12px}
+.personal-maps p{max-width:75ch;font-size:16px;line-height:24px;color:var(--md-sys-color-on-surface-variant)}
+#saved-map-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto;gap:16px;align-items:end;margin-top:20px}
+#saved-map-form label{display:grid;gap:8px;font-size:14px;line-height:20px;font-weight:700}
+#saved-map-form button{min-height:48px;background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary)}
+#saved-map-status{font-size:14px;line-height:20px}
+#saved-map-list{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
+#saved-map-list li{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 16px;background:var(--md-sys-color-surface);border-radius:16px}
+#saved-map-list li>a{flex:1;min-width:120px}
+#saved-map-list .saved-map-empty{font-size:14px;line-height:20px;color:var(--md-sys-color-on-surface-variant)}
+#personal-map-preview:not(:empty){margin-top:24px}
+.section-nav a:focus-visible,.prep-filters button:focus-visible,.personal-maps :focus-visible,.google-map-controls :focus-visible,.map-stop-list :focus-visible,.prep-task :focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:3px}
+@media(max-width:850px){.google-map-controls{grid-template-columns:1fr}.google-map-controls>a{justify-self:start}#saved-map-form{grid-template-columns:1fr 1fr}#saved-map-form button{grid-column:1/-1;justify-self:start}}
+@media(max-width:760px){#preparation .prep-body{grid-template-columns:1fr}.section-nav a{flex:0 0 auto}.section-nav{scrollbar-width:thin}.map-stop-list ul{grid-template-columns:1fr}}
+@media(max-width:540px){.section-nav{top:4px;padding:4px;gap:0;border-radius:12px}.section-nav a{padding:12px}.section-nav .material-symbols-rounded{display:none}.personal-maps{padding:20px}.personal-maps h3{font-size:22px;line-height:28px}#saved-map-form{grid-template-columns:1fr}#saved-map-form button{justify-self:stretch}.google-map-controls{padding:0 16px 16px}.google-map-controls>a{justify-self:stretch}.google-map-note{padding:16px 16px 0}.map-stop-list{margin:12px 16px 20px}iframe.google-map-frame,iframe#trip-map{height:340px}.prep-task-note{padding-left:16px}.prep-source{padding-left:16px}.prep-toolbar{gap:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.section-nav *,.personal-maps *{transition:none!important}}
+@media print{.section-nav,.trip-skip,.prep-filters,.prep-storage,#saved-map-form,#saved-map-status,#personal-map-preview,.google-map-frame,.google-map-controls,.google-map-note{display:none!important}.main>.switcher{position:static}#preparation .prep-body{display:block}#preparation .task-group,#preparation .prep-task{display:block!important;break-inside:avoid}.prep-task{margin-bottom:12px}#preparation .prep-empty{display:none!important}.map-stop-list ul{display:block}.map-stop-list{display:block}.personal-maps{break-inside:avoid}.section-nav~[id]{scroll-margin-top:0}}
