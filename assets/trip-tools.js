@@ -134,6 +134,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = [['itinerary','route','Маршрут'],['bookings','flight','Авиабилеты'],['hotels','hotel','Отели'],['maps','map','Карты'],['preparation','checklist','Подготовка']];
   nav.innerHTML = sections.map(([id, icon, label]) => `<a href="#${id}"><span class="material-symbols-rounded" aria-hidden="true">${icon}</span>${label}</a>`).join('');
   $('.main').prepend(nav);
+  const exportActions = document.createElement('div');
+  exportActions.className = 'trip-actions';
+  exportActions.innerHTML = '<button type="button" class="table-export"><span class="material-symbols-rounded" aria-hidden="true">picture_as_pdf</span>Сохранить таблицы PDF</button>';
+  nav.after(exportActions);
+  const tableExport = exportActions.querySelector('.table-export');
+  tableExport.addEventListener('click', () => {
+    const roadmaps = $$('.roadmap');
+    const previousViews = roadmaps.map(roadmap => roadmap.dataset.view);
+    const previousTitle = document.title;
+    roadmaps.forEach(roadmap => { roadmap.dataset.view = 'table'; });
+    document.body.dataset.pdfTables = 'true';
+    document.title = 'Дорожная карта — таблицы';
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      roadmaps.forEach((roadmap,index) => {
+        if (previousViews[index]) roadmap.dataset.view = previousViews[index];
+        else delete roadmap.dataset.view;
+      });
+      delete document.body.dataset.pdfTables;
+      document.title = previousTitle;
+    };
+    window.addEventListener('afterprint', cleanup, {once:true});
+    window.setTimeout(cleanup, 60000);
+    window.print();
+  });
   const skip = document.createElement('a');
   skip.className = 'trip-skip';
   skip.href = '#itinerary';
