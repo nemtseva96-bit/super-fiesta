@@ -15,13 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const prep = $('#preparation');
   const tasksContainer = $('#preparation-tasks');
   prep.querySelector('.prep-head').insertAdjacentHTML('beforeend', `
-    <p class="prep-reviewed">Проверено ${data.reviewed}. Сроки задач — рекомендации; правила въезда зависят от паспорта.</p>
     <div class="prep-toolbar"><div class="prep-filters" role="group" aria-label="Фильтр задач">
       <button type="button" data-task-filter="all" aria-pressed="true">Все</button>
       <button type="button" data-task-filter="pending" aria-pressed="false">Осталось</button>
       <button type="button" data-task-filter="done" aria-pressed="false">Выполнено</button>
-    </div><p id="prep-progress" role="status" aria-live="polite"></p></div>
-    <p class="prep-storage" id="prep-storage">Отметки сохраняются в этом браузере.</p>`);
+    </div><p id="prep-progress" role="status" aria-live="polite"></p></div>`);
+  prep.querySelector('.prep-reviewed')?.remove();
   data.groups.forEach((group, index) => {
     const section = document.createElement('section');
     section.className = 'task-group';
@@ -66,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     $$('#preparation .task-group').forEach(group => { group.hidden = ![...group.querySelectorAll('.prep-task')].some(row => !row.hidden); });
     empty.hidden = $$('#preparation .prep-task').some(row => !row.hidden);
-    if (!storageAvailable) $('#prep-storage').textContent = 'Браузер не разрешил сохранение. Отметки доступны только до перезагрузки страницы.';
   }
   tasksContainer.addEventListener('change', event => {
     if (!event.target.matches('input[data-key]')) return;
@@ -88,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     updatePreparation();
   });
+  $$('.overview').forEach(cardGroup => cardGroup.remove());
 
   // Put all shared sections in the main scroll surface and keep route tabs independent.
   $('.switcher').id = 'itinerary';
@@ -100,12 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
   mapsSection.id = 'maps';
   mapsSection.setAttribute('aria-labelledby', 'maps-heading');
   mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и мои места</h2><p>Общий маршрут, передвижения и ссылки на личные списки в одном месте.</p></div>';
+  const itineraryGroup = document.createElement('div');
+  itineraryGroup.className = 'maps-subgroup map-itinerary-group';
+  itineraryGroup.innerHTML = '<div class="section-title"><h3>Вся поездка и передвижения</h3><p>Полная последовательность от вылета из Петербурга до возвращения домой.</p></div>';
   const fullRoute = $('.full-route');
   if (fullRoute) {
     const journeyHeading = fullRoute.querySelector('.section-title');
     const journey = fullRoute.querySelector('.journey');
-    if (journeyHeading) mapsSection.append(journeyHeading);
-    if (journey) mapsSection.append(journey);
+    if (journeyHeading) {
+      journeyHeading.querySelector('h2')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Вся поездка целиком'}));
+      itineraryGroup.append(journeyHeading);
+    }
+    if (journey) itineraryGroup.append(journey);
     fullRoute.remove();
   }
   ['friends','couple'].forEach(routeId => {
@@ -113,9 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!movement) return;
     movement.classList.add('combined-movement');
     movement.dataset.route = routeId;
-    mapsSection.append(movement);
+    movement.querySelector('h2')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Все передвижения'}));
+    itineraryGroup.append(movement);
   });
-  mapsSection.append(mapCard);
+  mapsSection.append(itineraryGroup);
+  const mapsGroup = document.createElement('div');
+  mapsGroup.className = 'maps-subgroup map-links-group';
+  mapsGroup.innerHTML = '<div class="section-title"><h3>Карты и сохранённые места</h3><p>Остановки маршрута и твои личные списки Google Maps.</p></div>';
+  mapsGroup.append(mapCard);
+  mapsSection.append(mapsGroup);
   prep.before(mapsSection);
   const nav = document.createElement('nav');
   nav.className = 'section-nav';
@@ -221,8 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ['Квартира в Сеуле · 31 октября — 7 ноября','16-7 Hwigyeong-ro 2ga-gil Seoul South Korea'],
     ['Инчхон · 31 октября и 7 ноября','Incheon International Airport Terminal 1']
   ];
-  mapCard.innerHTML = `<div class="map-head"><div><h3>Остановки в Google Maps</h3><p>Выбери место, чтобы посмотреть его на карте. Вся последовательность поездки — в маршруте.</p></div></div>
-    <div class="google-map-controls"><label for="map-stop">Место на карте</label><select id="map-stop">${stops.map(([label],index) => `<option value="${index}">${escapeHTML(label)}</option>`).join('')}</select><a id="google-map-open" target="_blank" rel="noopener noreferrer">Открыть в Google Maps <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span></a></div>
+  mapCard.innerHTML = `<div class="map-head"><div><h4>Остановки в Google Maps</h4><p>Выбери место, чтобы посмотреть его на карте.</p></div></div>
+    <div class="google-map-controls"><label for="map-stop">Место на карте</label><div class="select-wrap"><select id="map-stop">${stops.map(([label],index) => `<option value="${index}">${escapeHTML(label)}</option>`).join('')}</select></div><a id="google-map-open" target="_blank" rel="noopener noreferrer">Открыть в Google Maps <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span></a></div>
     <iframe id="trip-map" class="google-map-frame" title="Google Maps: Шанхай" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     <p class="google-map-note">Если карта не загрузилась, открой место по ссылке выше. В материковом Китае Google может быть недоступен: заранее сохрани адреса и запасную карту. Для маршрутов по Сеулу пригодится NAVER Map.</p>
     <details class="map-stop-list"><summary>Все остановки — списком</summary><ul>${stops.map(([label,query]) => `<li>${externalLink(label, `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`)}</li>`).join('')}</ul></details>`;
@@ -242,7 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <details><summary>Где взять ссылку</summary><p>В Google Maps открой «Сохранённые» → нужный список → «Поделиться». Скопируй ссылку и добавь её ниже. Доступ к списку определяется его настройками в Google.</p><p>Для всех отметок на одной встроенной карте можно добавить ссылку Google My Maps. Встраивание работает только для карты с разрешённым публичным доступом — этот сайт не меняет её настройки.</p>${externalLink('Инструкция Google', 'https://support.google.com/maps/answer/7280933?hl=ru')}</details>
     <form id="saved-map-form"><label for="saved-map-name">Название списка<input id="saved-map-name" name="name" required maxlength="80" placeholder="Например, кафе Сеула"></label><label for="saved-map-url">Ссылка Google Maps<input id="saved-map-url" name="url" type="url" required maxlength="2048" placeholder="https://maps.app.goo.gl/…" aria-describedby="saved-map-status"></label><button type="submit">Добавить список</button></form>
     <p id="saved-map-status" role="status" aria-live="polite">Ссылки сохраняются только в этом браузере. Синхронизации с аккаунтом нет.</p><ul id="saved-map-list"></ul><div id="personal-map-preview"></div>`;
-  mapsSection.append(personal);
+  personal.querySelector('h3')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Мои списки Google Maps'}));
+  mapsGroup.append(personal);
   function validGoogleURL(value) {
     try {
       const url = new URL(value);
