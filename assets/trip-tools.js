@@ -26,9 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     section.className = 'task-group';
     section.setAttribute('aria-labelledby', `task-group-${index}`);
     section.innerHTML = `<h3 id="task-group-${index}">${group.title}</h3><p>${group.period}</p><div class="tasks"></div>`;
-    group.tasks.forEach(task => {
+    group.tasks.forEach((task, taskIndex) => {
       const row = document.createElement('div');
       row.className = `prep-task${task.priority ? ' prep-task--priority' : ''}`;
+      row.dataset.taskOrder = String(taskIndex);
       const source = data.sources[task.source];
       row.innerHTML = `<label class="task"><input type="checkbox" data-key="${task.key}" aria-describedby="note-${task.key}"><span>${task.title}${task.priority ? '<span class="deadline-chip">Проверить в первую очередь</span>' : ''}</span></label><p class="prep-task-note" id="note-${task.key}">${task.note}</p>${source ? `<div class="prep-source">${externalLink(source[0], source[1])}</div>` : ''}`;
       const input = row.querySelector('input');
@@ -66,6 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = input.closest('.prep-task');
       row.classList.toggle('is-done', input.checked);
       row.hidden = (filter === 'pending' && input.checked) || (filter === 'done' && !input.checked);
+    });
+    $$('#preparation .tasks').forEach(list => {
+      [...list.querySelectorAll(':scope > .prep-task')]
+        .sort((a, b) => {
+          const doneDifference = Number(a.querySelector('input').checked) - Number(b.querySelector('input').checked);
+          return doneDifference || Number(a.dataset.taskOrder) - Number(b.dataset.taskOrder);
+        })
+        .forEach(row => list.append(row));
     });
     $$('#preparation .task-group').forEach(group => { group.hidden = ![...group.querySelectorAll('.prep-task')].some(row => !row.hidden); });
     empty.hidden = $$('#preparation .prep-task').some(row => !row.hidden);
