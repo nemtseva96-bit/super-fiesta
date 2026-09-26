@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const input = row.querySelector('input');
       const saved = storage.get(`china26-${task.key}`);
       input.checked = saved === null ? !!task.done : saved === '1';
+      row.addEventListener('click', event => {
+        if (event.target.closest('a,button,input,label')) return;
+        input.click();
+      });
       section.querySelector('.tasks').append(row);
     });
     tasksContainer.append(section);
@@ -87,6 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePreparation();
   });
   $$('.overview').forEach(cardGroup => cardGroup.remove());
+  // The route summary belongs to the route as a whole, so show it before its heading.
+  $$('.roadmap').forEach(roadmap => {
+    const summary = roadmap.querySelector(':scope > .route-viz');
+    const heading = roadmap.querySelector(':scope > .road-head');
+    if (summary && heading) heading.before(summary);
+  });
 
   // Put all shared sections in the main scroll surface and keep route tabs independent.
   $('.switcher').id = 'itinerary';
@@ -102,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   mapsSection.className = 'section trip-maps';
   mapsSection.id = 'maps';
   mapsSection.setAttribute('aria-labelledby', 'maps-heading');
-  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и сохранённые места</h2><p>Остановки маршрута и твои личные списки Google Maps.</p></div>';
+  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и сохранённые места</h2></div>';
   mapsSection.append(mapCard);
   prep.before(fullRoute, mapsSection);
   const nav = document.createElement('nav');
@@ -165,6 +175,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const tabs = $$('.route-tab');
   $('.switcher').setAttribute('aria-label','Часть путешествия');
+  function placeTableExport(routeId) {
+    const toggle = document.querySelector(`#${routeId} .road-view-toggle`);
+    if (!toggle) return;
+    let controls = toggle.closest('.road-view-controls');
+    if (!controls) {
+      controls = document.createElement('div');
+      controls.className = 'road-view-controls';
+      toggle.before(controls);
+      controls.append(toggle);
+    }
+    controls.append(exportActions);
+  }
   function selectRoute(tab) {
     tabs.forEach(item => {
       const selected = item === tab;
@@ -174,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const panel = document.getElementById(item.dataset.route);
       panel.classList.toggle('active', selected);
     });
+    placeTableExport(tab.dataset.route);
     updateActiveSection();
   }
   tabs.forEach((tab,index) => {
@@ -236,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
   mapCard.innerHTML = `<div class="map-head"><div><h3>Остановки в Google Maps</h3><p>Выбери место, чтобы посмотреть его на карте.</p></div></div>
     <div class="google-map-controls"><label for="map-stop">Место на карте</label><div class="select-wrap"><select id="map-stop">${stops.map(([label],index) => `<option value="${index}">${escapeHTML(label)}</option>`).join('')}</select></div><a id="google-map-open" target="_blank" rel="noopener noreferrer">Открыть в Google Maps <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span></a></div>
     <iframe id="trip-map" class="google-map-frame" title="Google Maps: Шанхай" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
-    <p class="google-map-note">Если карта не загрузилась, открой место по ссылке выше. В материковом Китае Google может быть недоступен: заранее сохрани адреса и запасную карту. Для маршрутов по Сеулу пригодится NAVER Map.</p>
     <details class="map-stop-list"><summary>Все остановки — списком</summary><ul>${stops.map(([label,query]) => `<li>${externalLink(label, `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`)}</li>`).join('')}</ul></details>`;
   function showStop() {
     const [label,query] = stops[Number($('#map-stop').value)];
@@ -273,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSavedMaps() {
     const list = $('#saved-map-list');
     list.replaceChildren();
-    if (!savedMaps.length) { const item=document.createElement('li'); item.className='saved-map-empty'; item.textContent='Списков пока нет. Добавь первый — например, места в Сеуле.'; list.append(item); }
     savedMaps.forEach((item,index) => {
       const li = document.createElement('li');
       li.innerHTML = externalLink(item.name,item.url);

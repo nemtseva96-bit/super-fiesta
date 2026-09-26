@@ -203,7 +203,52 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 <link rel="stylesheet" href="./assets/trip-tools.css">
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const seoulFlight=[...document.querySelectorAll('.confirmed-group.flights .booking-card')].find(card=>card.querySelector('h4')?.textContent.trim()==='Чанша → Сеул');
+  const baggageFact=seoulFlight?.querySelectorAll('.booking-fact')[2];
+  if(baggageFact)baggageFact.innerHTML='<b>8 кг + 1×23 кг</b><small>на каждого из 2 пассажиров</small>';
+});
+</script>
 <script src="./assets/trip-data.js"></script>
 <script src="./assets/table-export.js"></script>
 <script src="./assets/trip-tools.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const textsToRemove=new Set([
+    'Цены и расписания на странице — ориентиры на 24 августа 2026 года. Перед оплатой проверяем багаж, правила обмена и финальную стоимость.',
+    'С учётом билетов, четырёх подтверждённых объектов размещения и поездки 16 октября — 7 ноября 2026.',
+    'Восемь дней без спортивного похода: города, вечерние огни и живописные горные прогулки налегке.',
+    'Семь дней по Хунани: старый город, храмы, два горных массива и один настоящий пеший день.'
+  ]);
+  document.querySelectorAll('p').forEach(paragraph=>{
+    if(textsToRemove.has(paragraph.textContent.trim()))paragraph.remove();
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const hotelGrid=document.querySelector('.confirmed-group.hotels .booking-grid');
+  if(!hotelGrid||hotelGrid.dataset.extended==='true')return;
+  const hotels=[
+    {dates:'22–24 октября · 2 ночи',name:'Homeinn Plus Hotel · Shanghai Xintiandi',address:'No. 7 Xujiahui Road, Huangpu District, Shanghai, 200023, China',checkIn:'После 14:00',checkOut:'До 14:00',room:'2 отдельные кровати',note:'Завтрак для 2 гостей · 23 и 24 октября'},
+    {dates:'24–26 октября · 2 ночи',name:'Atour S Changsha Wuyi Square River View',address:'48th Floor, Building 2, Runzhi Commercial Center, No. 112 Huangxing North Road, Kaifu District, Changsha, Hunan, China',checkIn:'После 14:00',checkOut:'До 14:00',room:'1 двуспальная кровать',note:'Завтрак для 2 гостей · 25 и 26 октября'},
+    {dates:'26–27 октября · 1 ночь',name:'Wenliyuan · Phoenix Ancient City Hongqiao',address:'No. 2 Shawanliren Lane, Tuojiang Town, Fenghuang County, Hunan, China',checkIn:'После 14:00',checkOut:'До 14:00',room:'1 двуспальная кровать',note:'Завтрак для 2 гостей · 27 октября'},
+    {dates:'27–29 октября · 2 ночи',name:'FUNGEE S Hotel · Zhangjiajie National Forest Park',address:'Buildings 1–2, Jiuyuan 10th Street, Wuling Avenue, Wulingyuan District, Zhangjiajie, Hunan, China',checkIn:'После 15:00',checkOut:'До 12:00',room:'1 двуспальная кровать',note:'Завтрак для 2 гостей · 28 и 29 октября'},
+    {dates:'29–30 октября · 1 ночь',name:'Atour Hotel · Tianmenshan Cableway Station',address:'Dianda Plaza Apartment Building, Guanliping Community, Yongding District, Zhangjiajie, Hunan, China',checkIn:'После 14:00',checkOut:'До 14:00',room:'1 двуспальная кровать',note:'Завтрак для 2 гостей · 30 октября'},
+    {dates:'30–31 октября · 1 ночь',name:'Vienna International Hotel · Changsha Huanghua Airport',address:'Building A1, Xiangyu International Plaza, No. 81 Dayuan East Road, Huanghua Town, Changsha County, Hunan, China',checkIn:'После 12:00',checkOut:'До 14:00',room:'1 двуспальная кровать',note:'Питание не включено'}
+  ];
+  hotelGrid.insertAdjacentHTML('beforeend',hotels.map(hotel=>`<article class="booking-card"><div class="booking-label"><span>${hotel.dates}</span><span>Оплачено</span></div><h4>${hotel.name}</h4><p class="booking-address"><strong>Адрес:</strong> ${hotel.address}</p><div class="booking-facts"><div class="booking-fact"><b>${hotel.checkIn}</b><small>заселение</small></div><div class="booking-fact"><b>${hotel.checkOut}</b><small>выезд</small></div><div class="booking-fact"><b>${hotel.room}</b><small>${hotel.note}</small></div></div></article>`).join(''));
+  const months={октября:9,ноября:10};
+  const checkInDate=card=>{
+    const label=card.querySelector('.booking-label span')?.textContent||'';
+    const match=label.match(/(\d{1,2})(?:[–-]\d{1,2})?\s+(октября|ноября)/i);
+    return match?new Date(2026,months[match[2].toLowerCase()],Number(match[1])).getTime():Number.MAX_SAFE_INTEGER;
+  };
+  [...hotelGrid.querySelectorAll(':scope > .booking-card')].sort((a,b)=>checkInDate(a)-checkInDate(b)).forEach(card=>hotelGrid.append(card));
+  hotelGrid.dataset.extended='true';
+  const ready=document.querySelector('.ready-card p');
+  if(ready)ready.innerHTML='Ключевые авиабилеты<br>и десять объектов размещения подтверждены.';
+});
+</script>
 </body></html>
