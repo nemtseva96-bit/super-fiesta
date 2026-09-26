@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.createElement('nav');
   nav.className = 'section-nav';
   nav.setAttribute('aria-label', 'Разделы поездки');
-  const sections = [['itinerary','route','Маршрут'],['bookings','flight','Авиабилеты'],['hotels','hotel','Отели'],['maps','map','Карты'],['preparation','checklist','Подготовка']];
+  const sections = [['itinerary','route','Маршрут'],['bookings','confirmation_number','Билеты и отели'],['maps','map','Карты'],['preparation','checklist','Подготовка']];
   nav.innerHTML = sections.map(([id, icon, label]) => `<a href="#${id}"><span class="material-symbols-rounded" aria-hidden="true">${icon}</span>${label}</a>`).join('');
   $('.main').prepend(nav);
   const exportActions = document.createElement('div');
