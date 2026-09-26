@@ -86,6 +86,9 @@ iframe.google-map-frame,iframe#trip-map{display:block;width:100%;height:460px;mi
 .main>.personal-maps{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .hero>*,.road-copy,.booking-card,.booking-fact,.task-group,.map-head>div,.section-title>*,.road-head>*,.confirmed-head>*{min-width:0}
 .booking-card,.road-copy,.task-group,.journey-stop{overflow-wrap:anywhere}
+.road-stop .road-plan{display:none}
+.road-stop .road-facts,.road-stop .place-actions,.road-stop .credit{display:none}
+.road-stop .inline-time{border-top:0}
 .journey-stop{box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;max-width:100%;height:100px}
 #preparation .task,#preparation .task:hover{transform:none;box-shadow:none;background:transparent}
 .prep-task{cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.prep-task:hover{transform:translateY(-2px);border-color:var(--md-sys-color-primary);box-shadow:0 6px 16px #3b07101f}.prep-task:has(input:focus-visible){outline:3px solid var(--md-sys-color-primary);outline-offset:3px}.prep-task .prep-source a{position:relative;z-index:1}
@@ -104,3 +107,30 @@ iframe.google-map-frame,iframe#trip-map{display:block;width:100%;height:460px;mi
 @media(max-width:700px){.road-view-controls{margin-top:10px}.road-view-controls .road-view-toggle{flex:1}.road-view-controls .table-export{flex:1}}
 @media(max-width:540px){.wrap{width:calc(100% - 20px)}.road-view-controls{gap:8px}.road-view-controls .road-view-toggle,.road-view-controls .table-export{width:100%;flex-basis:100%}.table-export-status{text-align:left}}
 @media(prefers-reduced-motion:reduce){.prep-task,.table-export,.print{transition:none}}
+
+/* Voyage UI — collapse used in the road-map location cards. */
+.road-stop .location-more{margin:16px 0 0;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-large);background:var(--md-sys-color-surface-container-low);overflow:hidden}
+.road-stop .location-more summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 14px;background:transparent;color:var(--md-sys-color-on-surface);cursor:pointer;font-size:14px;line-height:20px;font-weight:700;list-style:none;transition:background-color .2s,color .2s}
+.road-stop .location-more summary::-webkit-details-marker{display:none}
+.road-stop .location-more summary::after{content:'expand_more';float:none;flex:0 0 auto;font-family:'Material Symbols Rounded'!important;font-size:22px;font-style:normal;font-weight:400;line-height:1;font-feature-settings:'liga';transform:rotate(0);transition:transform .2s ease}
+.road-stop .location-more .collapse-label{display:none}
+.road-stop .location-more .expand-label,.road-stop .location-more[open] .expand-label{display:inline}
+.road-stop .location-more summary:hover{background:var(--md-sys-color-surface-container-high)}
+.road-stop .location-more summary:focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:-3px}
+.road-stop .location-more[open]{border-color:var(--md-sys-color-primary);background:var(--md-sys-color-surface-container)}
+.road-stop .location-more[open] summary{background:transparent;color:var(--md-sys-color-on-surface)}
+.road-stop .location-more[open] summary:hover{background:var(--md-sys-color-surface-container-high)}
+.road-stop .location-more[open] summary::after{content:'expand_more';transform:rotate(180deg)}
+.road-stop .location-guide{display:grid;gap:16px;padding:16px}
+.road-stop .location-guide-block+.location-guide-block{padding-top:16px;border-top:1px solid var(--md-sys-color-outline-variant)}
+.road-stop .location-guide-block h4{display:flex;align-items:center;gap:8px;margin:0 0 8px;color:var(--md-sys-color-on-surface);font-size:16px;line-height:24px;font-weight:700}
+.road-stop .location-guide-block h4 .material-symbols-rounded{flex:0 0 auto;color:var(--md-sys-color-primary);font-size:20px}
+.road-stop .location-guide-block p{margin:0;padding:0;color:var(--md-sys-color-on-surface-variant);font-size:14px;line-height:20px}
+.road-stop .location-guide-block ul{display:grid;gap:8px;margin:0;padding-left:20px;color:var(--md-sys-color-on-surface-variant);font-size:14px;line-height:20px}
+.road-stop .location-links{display:flex;flex-wrap:wrap;gap:8px}
+.road-stop .location-links a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:8px 12px;border-radius:999px;background:var(--md-sys-color-secondary-container);color:var(--md-sys-color-on-secondary-container);font-size:13px;line-height:18px;font-weight:700;text-decoration:none;transition:background-color .2s,box-shadow .2s}
+.road-stop .location-links a::before{content:'open_in_new';font-family:'Material Symbols Rounded'!important;font-size:16px;font-feature-settings:'liga'}
+.road-stop .location-links a:hover{box-shadow:inset 0 0 0 1px var(--md-sys-color-primary)}
+.road-stop .location-links a:focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:3px}
+@media(max-width:540px){.road-stop .location-more{margin-top:14px}.road-stop .location-more summary{padding:10px 12px}.road-stop .location-guide{gap:14px;padding:14px}.road-stop .location-guide-block+.location-guide-block{padding-top:14px}.road-stop .location-links a{width:100%;justify-content:flex-start}}
+@media(prefers-reduced-motion:reduce){.road-stop .location-more summary,.road-stop .location-more summary::after,.road-stop .location-links a{transition:none}}

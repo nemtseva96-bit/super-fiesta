@@ -254,4 +254,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(ready)ready.innerHTML='Ключевые авиабилеты<br>и десять объектов размещения подтверждены.';
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.location-guide-block').forEach(block=>{
+    if(block.querySelector('h4')?.textContent.includes('Почитать перед поездкой'))block.remove();
+  });
+});
+</script>
 </body></html>
