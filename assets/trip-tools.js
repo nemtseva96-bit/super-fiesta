@@ -5,10 +5,50 @@ document.addEventListener('DOMContentLoaded', () => {
   let storageAvailable = true;
   const storage = {
     get(key) { try { return localStorage.getItem(key); } catch { storageAvailable = false; return null; } },
-    set(key, value) { try { localStorage.setItem(key, value); return true; } catch { storageAvailable = false; return false; } }
+    set(key, value) { try { localStorage.setItem(key, value); return true; } catch { storageAvailable = false; return false; } },
+    remove(key) { try { localStorage.removeItem(key); return true; } catch { storageAvailable = false; return false; } }
   };
   const escapeHTML = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const externalLink = (label, url) => `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}<span class="material-symbols-rounded" aria-hidden="true">open_in_new</span></a>`;
+
+  const themeToggle = $('.theme-toggle');
+  if (themeToggle) {
+    const themes = {
+      light: { label: 'Светлая', icon: 'light_mode' },
+      dark: { label: 'Тёмная', icon: 'dark_mode' },
+      system: { label: 'Системная', icon: 'brightness_auto' }
+    };
+    const themeMenu = document.createElement('div');
+    themeMenu.className = 'theme-menu';
+    themeMenu.innerHTML = `<details><summary aria-label="Выбор темы"><span class="material-symbols-rounded theme-menu-icon" aria-hidden="true"></span><span class="theme-menu-value"></span><span class="material-symbols-rounded theme-menu-chevron" aria-hidden="true">expand_more</span></summary><div class="theme-menu-list">${Object.entries(themes).map(([mode, theme]) => `<button type="button" data-theme-mode="${mode}" aria-pressed="false"><span class="material-symbols-rounded" aria-hidden="true">${theme.icon}</span>${theme.label}</button>`).join('')}</div></details>`;
+    const details = themeMenu.querySelector('details');
+    const themeIcon = themeMenu.querySelector('.theme-menu-icon');
+    const themeValue = themeMenu.querySelector('.theme-menu-value');
+    const savedTheme = storage.get('china-theme');
+    const selectedTheme = themes[savedTheme] ? savedTheme : 'system';
+    const renderThemeMenu = mode => {
+      themeIcon.textContent = themes[mode].icon;
+      themeValue.textContent = themes[mode].label;
+      themeMenu.querySelectorAll('[data-theme-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeMode === mode)));
+    };
+    const setTheme = mode => {
+      if (mode === 'system') {
+        storage.remove('china-theme');
+        document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } else {
+        storage.set('china-theme', mode);
+        document.documentElement.dataset.theme = mode;
+      }
+      renderThemeMenu(mode);
+    };
+    setTheme(selectedTheme);
+    themeMenu.querySelectorAll('[data-theme-mode]').forEach(button => button.addEventListener('click', () => {
+      setTheme(button.dataset.themeMode);
+      details.open = false;
+      details.querySelector('summary').focus();
+    }));
+    themeToggle.replaceWith(themeMenu);
+  }
 
   // One owner for task state, counts and filtering. Existing stable keys are retained.
   const data = window.tripPreparation;
