@@ -92,42 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
   $('.switcher').id = 'itinerary';
   $('.confirmed').id = 'bookings';
   $('.confirmed-group.hotels').id = 'hotels';
-  $('.full-route').id = 'trip-overview';
+  const fullRoute = $('.full-route');
+  fullRoute.id = 'trip-overview';
+  fullRoute.className = 'section full-route';
+  fullRoute.querySelector('h2').textContent = 'Вся поездка целиком';
+  fullRoute.querySelector('.section-title p').textContent = 'Полная последовательность от вылета из Петербурга до возвращения домой.';
   const mapCard = $('.map-card');
   const mapsSection = document.createElement('section');
   mapsSection.className = 'section trip-maps';
   mapsSection.id = 'maps';
   mapsSection.setAttribute('aria-labelledby', 'maps-heading');
-  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и мои места</h2><p>Общий маршрут, передвижения и ссылки на личные списки в одном месте.</p></div>';
-  const itineraryGroup = document.createElement('div');
-  itineraryGroup.className = 'maps-subgroup map-itinerary-group';
-  itineraryGroup.innerHTML = '<div class="section-title"><h3>Вся поездка и передвижения</h3><p>Полная последовательность от вылета из Петербурга до возвращения домой.</p></div>';
-  const fullRoute = $('.full-route');
-  if (fullRoute) {
-    const journeyHeading = fullRoute.querySelector('.section-title');
-    const journey = fullRoute.querySelector('.journey');
-    if (journeyHeading) {
-      journeyHeading.querySelector('h2')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Вся поездка целиком'}));
-      itineraryGroup.append(journeyHeading);
-    }
-    if (journey) itineraryGroup.append(journey);
-    fullRoute.remove();
-  }
-  ['friends','couple'].forEach(routeId => {
-    const movement = document.querySelector(`#${routeId} > .section:has(.moves)`);
-    if (!movement) return;
-    movement.classList.add('combined-movement');
-    movement.dataset.route = routeId;
-    movement.querySelector('h2')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Все передвижения'}));
-    itineraryGroup.append(movement);
-  });
-  mapsSection.append(itineraryGroup);
-  const mapsGroup = document.createElement('div');
-  mapsGroup.className = 'maps-subgroup map-links-group';
-  mapsGroup.innerHTML = '<div class="section-title"><h3>Карты и сохранённые места</h3><p>Остановки маршрута и твои личные списки Google Maps.</p></div>';
-  mapsGroup.append(mapCard);
-  mapsSection.append(mapsGroup);
-  prep.before(mapsSection);
+  mapsSection.innerHTML = '<div class="section-title"><h2 id="maps-heading">Карты и сохранённые места</h2><p>Остановки маршрута и твои личные списки Google Maps.</p></div>';
+  mapsSection.append(mapCard);
+  prep.before(fullRoute, mapsSection);
   const nav = document.createElement('nav');
   nav.className = 'section-nav';
   nav.setAttribute('aria-label', 'Разделы поездки');
@@ -136,30 +113,28 @@ document.addEventListener('DOMContentLoaded', () => {
   $('.main').prepend(nav);
   const exportActions = document.createElement('div');
   exportActions.className = 'trip-actions';
-  exportActions.innerHTML = '<button type="button" class="table-export"><span class="material-symbols-rounded" aria-hidden="true">picture_as_pdf</span>Сохранить таблицы PDF</button>';
+  exportActions.innerHTML = '<button type="button" class="table-export"><span class="material-symbols-rounded" aria-hidden="true">picture_as_pdf</span>Скачать таблицы .pdf</button>';
   nav.after(exportActions);
   const tableExport = exportActions.querySelector('.table-export');
-  tableExport.addEventListener('click', () => {
-    const roadmaps = $$('.roadmap');
-    const previousViews = roadmaps.map(roadmap => roadmap.dataset.view);
-    const previousTitle = document.title;
-    roadmaps.forEach(roadmap => { roadmap.dataset.view = 'table'; });
-    document.body.dataset.pdfTables = 'true';
-    document.title = 'Дорожная карта — таблицы';
-    let cleaned = false;
-    const cleanup = () => {
-      if (cleaned) return;
-      cleaned = true;
-      roadmaps.forEach((roadmap,index) => {
-        if (previousViews[index]) roadmap.dataset.view = previousViews[index];
-        else delete roadmap.dataset.view;
-      });
-      delete document.body.dataset.pdfTables;
-      document.title = previousTitle;
-    };
-    window.addEventListener('afterprint', cleanup, {once:true});
-    window.setTimeout(cleanup, 60000);
-    window.print();
+  const exportStatus = document.createElement('p');
+  exportStatus.className = 'table-export-status';
+  exportStatus.setAttribute('role', 'status');
+  exportStatus.setAttribute('aria-live', 'polite');
+  exportActions.append(exportStatus);
+  tableExport.addEventListener('click', async () => {
+    tableExport.disabled = true;
+    tableExport.setAttribute('aria-busy', 'true');
+    exportStatus.textContent = 'Готовим таблицы…';
+    try {
+      await window.downloadTripTables($$('.road-table'));
+      exportStatus.textContent = 'PDF с таблицами готов.';
+    } catch (error) {
+      console.error('Table export failed:', error);
+      exportStatus.textContent = 'Не удалось скачать PDF. Попробуй ещё раз.';
+    } finally {
+      tableExport.disabled = false;
+      tableExport.removeAttribute('aria-busy');
+    }
   });
   const skip = document.createElement('a');
   skip.className = 'trip-skip';
@@ -199,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const panel = document.getElementById(item.dataset.route);
       panel.classList.toggle('active', selected);
     });
-    $$('.combined-movement').forEach(section => section.classList.toggle('is-active', section.dataset.route === tab.dataset.route));
     updateActiveSection();
   }
   tabs.forEach((tab,index) => {
@@ -259,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['Квартира в Сеуле · 31 октября — 7 ноября','16-7 Hwigyeong-ro 2ga-gil Seoul South Korea'],
     ['Инчхон · 31 октября и 7 ноября','Incheon International Airport Terminal 1']
   ];
-  mapCard.innerHTML = `<div class="map-head"><div><h4>Остановки в Google Maps</h4><p>Выбери место, чтобы посмотреть его на карте.</p></div></div>
+  mapCard.innerHTML = `<div class="map-head"><div><h3>Остановки в Google Maps</h3><p>Выбери место, чтобы посмотреть его на карте.</p></div></div>
     <div class="google-map-controls"><label for="map-stop">Место на карте</label><div class="select-wrap"><select id="map-stop">${stops.map(([label],index) => `<option value="${index}">${escapeHTML(label)}</option>`).join('')}</select></div><a id="google-map-open" target="_blank" rel="noopener noreferrer">Открыть в Google Maps <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span></a></div>
     <iframe id="trip-map" class="google-map-frame" title="Google Maps: Шанхай" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     <p class="google-map-note">Если карта не загрузилась, открой место по ссылке выше. В материковом Китае Google может быть недоступен: заранее сохрани адреса и запасную карту. Для маршрутов по Сеулу пригодится NAVER Map.</p>
@@ -274,14 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#map-stop').addEventListener('change',showStop);
   showStop();
 
-  const personal = document.createElement('div');
+  const personal = document.createElement('section');
   personal.className = 'personal-maps';
-  personal.innerHTML = `<h3>Мои списки Google Maps</h3><p>Добавь ссылку на список поездки, чтобы открывать его отсюда. Войдёшь в свой Google-аккаунт на стороне Google; сайт не читает твои сохранённые места автоматически.</p>
+  personal.setAttribute('aria-labelledby', 'personal-maps-heading');
+  personal.innerHTML = `<div class="personal-maps-head"><h4 id="personal-maps-heading">Мои списки Google Maps</h4><p>Добавь ссылку на список поездки, чтобы открывать его отсюда. Войдёшь в свой Google-аккаунт на стороне Google; сайт не читает твои сохранённые места автоматически.</p></div>
     <details><summary>Где взять ссылку</summary><p>В Google Maps открой «Сохранённые» → нужный список → «Поделиться». Скопируй ссылку и добавь её ниже. Доступ к списку определяется его настройками в Google.</p><p>Для всех отметок на одной встроенной карте можно добавить ссылку Google My Maps. Встраивание работает только для карты с разрешённым публичным доступом — этот сайт не меняет её настройки.</p>${externalLink('Инструкция Google', 'https://support.google.com/maps/answer/7280933?hl=ru')}</details>
     <form id="saved-map-form"><label for="saved-map-name">Название списка<input id="saved-map-name" name="name" required maxlength="80" placeholder="Например, кафе Сеула"></label><label for="saved-map-url">Ссылка Google Maps<input id="saved-map-url" name="url" type="url" required maxlength="2048" placeholder="https://maps.app.goo.gl/…" aria-describedby="saved-map-status"></label><button type="submit">Добавить список</button></form>
     <p id="saved-map-status" role="status" aria-live="polite">Ссылки сохраняются только в этом браузере. Синхронизации с аккаунтом нет.</p><ul id="saved-map-list"></ul><div id="personal-map-preview"></div>`;
-  personal.querySelector('h3')?.replaceWith(Object.assign(document.createElement('h4'), {textContent: 'Мои списки Google Maps'}));
-  mapsGroup.append(personal);
+  mapCard.append(personal);
   function validGoogleURL(value) {
     try {
       const url = new URL(value);
