@@ -24,8 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const details = themeMenu.querySelector('details');
     const themeIcon = themeMenu.querySelector('.theme-menu-icon');
     const themeValue = themeMenu.querySelector('.theme-menu-value');
+    let bootedSystemTheme = false;
+    try {
+      bootedSystemTheme = localStorage.getItem('china-theme-mode') === 'system';
+      localStorage.removeItem('china-theme-mode');
+    } catch { storageAvailable = false; }
     const savedTheme = storage.get('china-theme');
-    const selectedTheme = themes[savedTheme] ? savedTheme : 'system';
+    const selectedTheme = bootedSystemTheme || !themes[savedTheme] ? 'system' : savedTheme;
     const renderThemeMenu = mode => {
       themeIcon.textContent = themes[mode].icon;
       themeValue.textContent = themes[mode].label;
@@ -388,7 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   renderSavedMaps();
   if (!storageAvailable) $('#saved-map-status').textContent = 'Сохранение в браузере недоступно. Добавленные ссылки останутся только до перезагрузки.';
-  if (location.hash && document.getElementById(location.hash.slice(1))) requestAnimationFrame(() => navigateTo(location.hash.slice(1),false));
 
   // Enforce safe external-link behavior for legacy itinerary links too.
   $$('a[target="_blank"]').forEach(link => link.rel = 'noopener noreferrer');
@@ -396,4 +400,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hiddenLabel) hiddenLabel.remove();
   const secondPartLabel = $$('.hike small').find(el => el.textContent.trim() === 'Только во второй части');
   if (secondPartLabel) secondPartLabel.remove();
+  const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => {
+    document.documentElement.style.scrollBehavior = previousScrollBehavior;
+    document.documentElement.dataset.pageReady = 'true';
+  });
 });
