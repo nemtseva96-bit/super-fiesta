@@ -56,3 +56,63 @@ window.tripPreparation = {
     ]}
   ]
 };
+
+// Seoul tasks share the preparation list and its existing filters and progress.
+window.tripPreparation.groups.splice(window.tripPreparation.groups.length - 1, 0, {
+  "title": "Сеул: бронирования и прогулки",
+  "period": "До прилёта и по дням · 31 октября — 6 ноября",
+  "tasks": [
+    {
+      "key": "seoul-booking-0",
+      "title": "Забронировать вход в Hwadam Forest; монорельс — отдельно",
+      "note": "Выбрать дату и время входа; при отсутствии билетов переставить выезды."
+    },
+    {
+      "key": "seoul-booking-1",
+      "title": "Забронировать слот Audeum",
+      "note": "Подстроить день с MMCA Gwacheon под подтверждённый слот музея."
+    },
+    {
+      "key": "seoul-booking-2",
+      "title": "Забронировать Huwon / Secret Garden",
+      "note": "Утренний сеанс определяет порядок посещения дворцов 6 ноября."
+    },
+    {
+      "key": "seoul-booking-3",
+      "title": "Выбрать тур в Сораксан или купить обратный автобусный билет",
+      "note": "На 1 ноября нужен заранее согласованный возврат; при плохой погоде — Сувон."
+    },
+    {
+      "key": "seoul-booking-4",
+      "title": "Подтвердить афишу Halloween в Хондэ",
+      "note": "Выбрать конкретное заведение; после вечера в Хондэ запланирован ранний выезд."
+    },
+    {
+      "key": "seoul-prepare-0",
+      "title": "Сохранить адрес квартиры и точки в Naver Map",
+      "note": "Сохранить адрес квартиры, входы и остановки для всех дней маршрута."
+    },
+    {
+      "key": "seoul-prepare-1",
+      "title": "Проверить часы музеев и работу монорельсов",
+      "note": "Сверить информацию перед каждым визитом."
+    },
+    {
+      "key": "seoul-prepare-2",
+      "title": "Проверить погоду и доступность троп Сораксана",
+      "note": "Проверить накануне выезда 1 ноября."
+    },
+    {
+      "key": "seoul-prepare-3",
+      "title": "Проверить состояние розовой травы в Jamwon",
+      "note": "Визит 5 ноября зависит от погоды и состояния травы."
+    }
+  ]
+});
+// Retain checks from the former Seoul-only task list.
+[["booking-0","seoul-booking-0"],["booking-1","seoul-booking-1"],["booking-2","seoul-booking-2"],["booking-3","seoul-booking-3"],["booking-4","seoul-booking-4"],["prepare-0","seoul-prepare-0"],["prepare-1","seoul-prepare-1"],["prepare-2","seoul-prepare-2"],["prepare-3","seoul-prepare-3"],["prepare-4","seoul-early-airport"]].forEach(([previous, key]) => {
+  try {
+    const saved = localStorage.getItem('seoul26-task-' + previous);
+    if (saved !== null && localStorage.getItem('china26-' + key) === null) localStorage.setItem('china26-' + key, saved);
+  } catch {}
+});

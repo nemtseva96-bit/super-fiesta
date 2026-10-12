@@ -134,3 +134,17 @@ iframe.google-map-frame,iframe#trip-map{display:block;width:100%;height:460px;mi
 .road-stop .location-links a:focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:3px}
 @media(max-width:540px){.road-stop .location-more{margin-top:14px}.road-stop .location-more summary{padding:10px 12px}.road-stop .location-guide{gap:14px;padding:14px}.road-stop .location-guide-block+.location-guide-block{padding-top:14px}.road-stop .location-links a{width:100%;justify-content:flex-start}}
 @media(prefers-reduced-motion:reduce){.road-stop .location-more summary,.road-stop .location-more summary::after,.road-stop .location-links a{transition:none}}
+
+/* Keep section links and segment tabs together while scrolling. */
+.trip-navigation{position:sticky;top:8px;z-index:40;display:grid;gap:8px;margin-bottom:24px;background:transparent;border-radius:20px}
+.trip-navigation>.section-nav{position:static;margin:0}
+.trip-navigation>.switcher{position:static;top:auto;bottom:auto;left:auto;transform:none;justify-self:center;width:100%;max-width:720px;margin:0;display:grid;gap:8px;padding:4px;border:1px solid var(--md-sys-color-outline);border-radius:999px;grid-template-columns:repeat(3,minmax(0,1fr));background:color-mix(in srgb,var(--md-sys-color-surface) 92%,transparent);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+#seoul-bookings,#seoul-maps,#seoul-reserve{scroll-margin-top:var(--trip-nav-height)}
+.seoul-address p{margin:0 0 8px;overflow-wrap:anywhere}
+.seoul-address [lang="ko"]{word-break:keep-all}
+@media(max-width:540px){
+  .trip-navigation{top:4px;gap:4px;border-radius:12px}
+  .trip-navigation>.switcher{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;padding:4px;border-radius:999px}
+  .trip-navigation>.switcher .route-tab{flex:1 0 auto;min-height:44px;padding:8px 12px;white-space:nowrap}
+}
+@media print{.trip-navigation{display:none!important}}

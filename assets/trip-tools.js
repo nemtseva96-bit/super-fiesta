@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fullRoute.className = 'section full-route';
   fullRoute.querySelector('h2').textContent = 'Вся поездка целиком';
   fullRoute.querySelector('.section-title p').textContent = 'Полная последовательность от вылета из Петербурга до возвращения домой.';
-  const mapCard = $('.map-card');
+  const mapCard = document.querySelector('.map-card:not(#seoul .map-card)');
   const mapsSection = document.createElement('section');
   mapsSection.className = 'section trip-maps';
   mapsSection.id = 'maps';
@@ -174,7 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
   nav.setAttribute('aria-label', 'Разделы поездки');
   const sections = [['itinerary','route','Маршрут'],['bookings','confirmation_number','Билеты и отели'],['maps','map','Карты'],['preparation','checklist','Задачи']];
   nav.innerHTML = sections.map(([id, icon, label]) => `<a href="#${id}"><span class="material-symbols-rounded" aria-hidden="true">${icon}</span>${label}</a>`).join('');
-  $('.main').prepend(nav);
+  const navigation = document.createElement('div');
+  navigation.className = 'trip-navigation';
+  $('.main').prepend(navigation);
+  navigation.append(nav, $('.switcher'));
   const exportActions = document.createElement('div');
   exportActions.className = 'trip-actions';
   exportActions.innerHTML = '<button type="button" class="table-export"><span class="material-symbols-rounded" aria-hidden="true">picture_as_pdf</span>Скачать таблицы .pdf</button>';
@@ -206,6 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
   skip.textContent = 'Перейти к маршруту';
   document.body.prepend(skip);
   function navigateTo(id, updateHash = true) {
+    const seoulTargets = {bookings:'seoul-bookings', maps:'seoul-maps'};
+    if (document.getElementById('seoul')?.classList.contains('active')) id = seoulTargets[id] || id;
     const target = document.getElementById(id);
     if (!target) return;
     if (updateHash) { try { history.pushState(null, '', `#${id}`); } catch { /* file:// may restrict history */ } }
@@ -272,9 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   function updateActiveSection() {
-    const offset = nav.getBoundingClientRect().height + 36;
+    const offset = navigation.getBoundingClientRect().height + 36;
     let active = sections[0][0];
-    sections.forEach(([id]) => { if (document.getElementById(id).getBoundingClientRect().top <= offset) active = id; });
+    sections.forEach(([id]) => { const selectedSeoul = document.getElementById('seoul')?.classList.contains('active');
+      const destination = selectedSeoul ? ({bookings:'seoul-bookings', maps:'seoul-maps'}[id] || id) : id;
+      if (document.getElementById(destination).getBoundingClientRect().top <= offset) active = destination; });
     nav.querySelectorAll('a').forEach(link => {
       if (link.hash === `#${active}`) link.setAttribute('aria-current','location');
       else link.removeAttribute('aria-current');
@@ -288,10 +295,10 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => { updateActiveSection(); scheduled = false; });
   }, {passive:true});
   const resizeNav = () => {
-    document.documentElement.style.setProperty('--trip-nav-height', `${nav.getBoundingClientRect().height + 28}px`);
+    document.documentElement.style.setProperty('--trip-nav-height', `${navigation.getBoundingClientRect().height + 28}px`);
     updateActiveSection();
   };
-  if (window.ResizeObserver) new ResizeObserver(resizeNav).observe(nav);
+  if (window.ResizeObserver) new ResizeObserver(resizeNav).observe(navigation);
   resizeNav();
   window.addEventListener('hashchange', () => navigateTo(location.hash.slice(1), false));
 
